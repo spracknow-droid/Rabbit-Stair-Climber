@@ -8,11 +8,13 @@ import { motion } from 'framer-motion';
 import { GameState } from './types';
 import { GRAVITY, JUMP_FORCE, SPEED, CANVAS_WIDTH, CANVAS_HEIGHT, MAX_FLOOR, INITIAL_PLATFORMS } from './constants';
 import { generateQuiz, createFloorPlatforms } from './utils/gameUtils';
-import { drawRabbit, drawDoor } from './utils/drawingUtils';
-import { drawBackground, drawPlatform } from './utils/environmentUtils';
+import { drawRabbit } from './utils/rabbitDrawingUtils';
+import { drawDoor } from './utils/propDrawingUtils';
+import { drawBackground } from './utils/backgroundDrawingUtils';
+import { drawPlatform } from './utils/platformDrawingUtils';
 import { updatePhysics } from './utils/physicsUtils';
 import { QuizOverlay } from './components/QuizOverlay';
-import { WinScreen } from './components/WinScreen';
+import { EndingOverlay } from './components/Ending/EndingOverlay';
 import { GameUI } from './components/GameUI';
 import { ShopOverlay } from './components/ShopOverlay';
 import { TRANSLATIONS } from './localization';
@@ -33,6 +35,8 @@ export default function App() {
   const [ownedItems, setOwnedItems] = useState<string[]>([]);
   const [equippedHat, setEquippedHat] = useState<string | undefined>(undefined);
   const [equippedCape, setEquippedCape] = useState<string | undefined>(undefined);
+  const [equippedGlasses, setEquippedGlasses] = useState<string | undefined>(undefined);
+  const [equippedStaff, setEquippedStaff] = useState<string | undefined>(undefined);
   const nextAbility = getNextAbility(magicLevel);
   
   const gameState = useRef<GameState>({
@@ -76,8 +80,13 @@ export default function App() {
 
   // Sync React state to Ref for rendering
   useEffect(() => {
-    gameState.current.rabbit.accessories = { hat: equippedHat as any, cape: equippedCape as any };
-  }, [equippedHat, equippedCape]);
+    gameState.current.rabbit.accessories = { 
+      hat: equippedHat as any, 
+      cape: equippedCape as any,
+      glasses: equippedGlasses as any,
+      staff: equippedStaff as any
+    };
+  }, [equippedHat, equippedCape, equippedGlasses, equippedStaff]);
 
   const handleNextFloor = () => {
     if (floor >= MAX_FLOOR) {
@@ -134,6 +143,8 @@ export default function App() {
   const handleEquipItem = (item: any) => {
     if (item.type === 'hat') setEquippedHat(item.value);
     if (item.type === 'cape') setEquippedCape(item.value);
+    if (item.type === 'glasses') setEquippedGlasses(item.value);
+    if (item.type === 'staff') setEquippedStaff(item.value);
   };
 
   const handleQuizSubmit = (e: React.FormEvent) => {
@@ -238,7 +249,7 @@ export default function App() {
       window.removeEventListener('keyup', handleKeyUp);
       cancelAnimationFrame(animationFrameId);
     };
-  }, [floor, gems, magicLevel, equippedHat, equippedCape]);
+  }, [floor, gems, magicLevel, equippedHat, equippedCape, equippedGlasses, equippedStaff]);
 
   return (
     <div className="min-h-screen bg-indigo-950 flex flex-col items-center justify-center p-4 font-sans">
@@ -274,6 +285,8 @@ export default function App() {
               ownedItems={ownedItems}
               equippedHat={equippedHat}
               equippedCape={equippedCape}
+              equippedGlasses={equippedGlasses}
+              equippedStaff={equippedStaff}
               onBuy={handleBuyItem}
               onEquip={handleEquipItem}
               onClose={() => {
@@ -285,7 +298,12 @@ export default function App() {
             />
           )}
 
-          {gameStatus === 'won' && <WinScreen />}
+          {gameStatus === 'won' && (
+            <EndingOverlay 
+              rabbit={gameState.current.rabbit} 
+              onRestart={() => window.location.reload()} 
+            />
+          )}
         </div>
 
         <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">

@@ -5,55 +5,6 @@
 
 import { Platform } from '../types';
 
-export const drawBackground = (ctx: CanvasRenderingContext2D, width: number, height: number, floor: number) => {
-  // Dynamic gradient based on floor (gets darker/more magical as you climb)
-  const gradient = ctx.createLinearGradient(0, 0, 0, height);
-  
-  // Base colors shift slightly every 10 floors
-  const hueShift = Math.min(floor * 2, 60); 
-  gradient.addColorStop(0, `hsl(${240 + hueShift}, 30%, 10%)`);
-  gradient.addColorStop(1, `hsl(${230 + hueShift}, 40%, 15%)`);
-  
-  ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, width, height);
-
-  // Draw layered stars for parallax-like depth
-  const drawStarLayer = (count: number, speedMult: number, sizeMult: number, alpha: number) => {
-    ctx.fillStyle = '#ffffff';
-    ctx.globalAlpha = alpha;
-    for (let i = 0; i < count; i++) {
-      // Use floor to shift stars slightly for a sense of movement
-      const seed = i * 137.5;
-      const x = ((seed % 1) * width);
-      const y = (((seed * 1.5 + floor * speedMult) % 1) * height);
-      const size = (seed % 0.5 + 0.5) * sizeMult;
-      
-      ctx.beginPath();
-      ctx.arc(x, y, size, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  };
-
-  drawStarLayer(40, 0.2, 1, 0.3); // Far stars
-  drawStarLayer(20, 0.5, 2, 0.6); // Mid stars
-  
-  // Draw distant castle silhouettes or magical clouds
-  ctx.fillStyle = '#0f0f1a';
-  ctx.globalAlpha = 0.4;
-  ctx.beginPath();
-  ctx.moveTo(0, height);
-  ctx.lineTo(100, height - 50);
-  ctx.lineTo(200, height - 120);
-  ctx.lineTo(300, height - 60);
-  ctx.lineTo(450, height - 150);
-  ctx.lineTo(600, height - 80);
-  ctx.lineTo(width, height - 130);
-  ctx.lineTo(width, height);
-  ctx.fill();
-
-  ctx.globalAlpha = 1.0;
-};
-
 export const drawPlatform = (ctx: CanvasRenderingContext2D, platform: Platform) => {
   const { x, y, width, height } = platform;
   

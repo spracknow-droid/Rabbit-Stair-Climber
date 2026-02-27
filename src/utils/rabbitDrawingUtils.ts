@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Rabbit, Door } from '../types';
-import { TRANSLATIONS } from '../localization';
+import { Rabbit } from '../types';
 
 export const drawRabbit = (ctx: CanvasRenderingContext2D, rabbit: Rabbit) => {
   const { x, y, width: w, height: h, facingRight } = rabbit;
@@ -139,19 +138,46 @@ export const drawRabbit = (ctx: CanvasRenderingContext2D, rabbit: Rabbit) => {
   ctx.arc(7, -8, 2, 0, Math.PI * 2);
   ctx.fill();
 
-  // Glasses (Always there, he's a smart rabbit)
-  ctx.strokeStyle = '#333333';
-  ctx.lineWidth = 1.2;
-  ctx.beginPath();
-  ctx.arc(-7, -8, 6, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.arc(7, -8, 6, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(-1, -8);
-  ctx.lineTo(1, -8);
-  ctx.stroke();
+  // Base Glasses (Only if no special glasses equipped)
+  if (!rabbit.accessories.glasses) {
+    ctx.strokeStyle = '#333333';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.arc(-7, -8, 6, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(7, -8, 6, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(-1, -8);
+    ctx.lineTo(1, -8);
+    ctx.stroke();
+  } else if (rabbit.accessories.glasses === 'heart') {
+    // Heart Glasses (Shrunk and centered)
+    ctx.strokeStyle = '#FF69B4';
+    ctx.lineWidth = 1.5;
+    
+    const drawHeart = (hx: number, hy: number, size: number) => {
+      ctx.beginPath();
+      ctx.moveTo(hx, hy);
+      ctx.bezierCurveTo(hx, hy - size, hx + size, hy - size, hx + size, hy);
+      ctx.bezierCurveTo(hx + size, hy + size, hx, hy + size * 1.5, hx, hy + size * 2);
+      ctx.bezierCurveTo(hx, hy + size * 1.5, hx - size, hy + size, hx - size, hy);
+      ctx.bezierCurveTo(hx - size, hy - size, hx, hy - size, hx, hy);
+      ctx.stroke();
+    };
+
+    // Left heart
+    drawHeart(-7, -11, 4);
+    // Right heart
+    drawHeart(7, -11, 4);
+    
+    // Bridge
+    ctx.beginPath();
+    ctx.moveTo(-3, -9);
+    ctx.lineTo(3, -9);
+    ctx.stroke();
+  }
 
   // Nose
   ctx.fillStyle = '#FF9999';
@@ -159,80 +185,27 @@ export const drawRabbit = (ctx: CanvasRenderingContext2D, rabbit: Rabbit) => {
   ctx.arc(0, -3, 2, 0, Math.PI * 2);
   ctx.fill();
 
-  ctx.restore();
-};
-
-export const drawDoor = (ctx: CanvasRenderingContext2D, door: Door, label?: string) => {
-  ctx.save();
-  
-  // Outer Glow for magical feel
-  ctx.shadowBlur = 15;
-  ctx.shadowColor = door.isOpen ? '#9d4edd' : 'rgba(0,0,0,0.3)';
-  
-  // Door frame (Stone/Wood mix)
-  const frameGrad = ctx.createLinearGradient(door.x, door.y, door.x + door.width, door.y);
-  frameGrad.addColorStop(0, '#2d1b0f');
-  frameGrad.addColorStop(0.5, '#4d2b1f');
-  frameGrad.addColorStop(1, '#2d1b0f');
-  ctx.fillStyle = frameGrad;
-  ctx.fillRect(door.x - 8, door.y - 8, door.width + 16, door.height + 8);
-  
-  // Door surface
-  const surfaceGrad = ctx.createLinearGradient(door.x, door.y, door.x + door.width, door.y);
-  if (door.isOpen) {
-    surfaceGrad.addColorStop(0, '#0f0c29');
-    surfaceGrad.addColorStop(0.5, '#302b63');
-    surfaceGrad.addColorStop(1, '#24243e');
-  } else {
-    surfaceGrad.addColorStop(0, '#4e342e');
-    surfaceGrad.addColorStop(0.5, '#6d4c41');
-    surfaceGrad.addColorStop(1, '#4e342e');
-  }
-  ctx.fillStyle = surfaceGrad;
-  ctx.fillRect(door.x, door.y, door.width, door.height);
-  
-  // Door details
-  if (!door.isOpen) {
-    // Door handle (Gold)
-    ctx.fillStyle = '#ffd700';
+  // Magic Staff
+  if (rabbit.accessories.staff === 'magic') {
+    ctx.save();
+    ctx.translate(20, 15);
+    ctx.rotate(Math.PI / 4);
+    // Staff body
+    ctx.fillStyle = '#8B4513';
+    ctx.fillRect(-2, -25, 4, 40);
+    // Gem on top
+    ctx.fillStyle = '#00FFFF';
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = '#00FFFF';
     ctx.beginPath();
-    ctx.arc(door.x + door.width - 15, door.y + door.height / 2, 5, 0, Math.PI * 2);
+    ctx.moveTo(0, -35);
+    ctx.lineTo(8, -25);
+    ctx.lineTo(0, -15);
+    ctx.lineTo(-8, -25);
+    ctx.closePath();
     ctx.fill();
-    
-    // Magical runes (Glow)
-    ctx.strokeStyle = '#e0aaff';
-    ctx.lineWidth = 1.5;
-    ctx.globalAlpha = 0.5 + Math.sin(Date.now() / 500) * 0.2; // Pulsing runes
-    ctx.beginPath();
-    ctx.moveTo(door.x + 15, door.y + 20);
-    ctx.lineTo(door.x + door.width - 15, door.y + 35);
-    ctx.moveTo(door.x + 15, door.y + 50);
-    ctx.lineTo(door.x + door.width - 15, door.y + 25);
-    ctx.stroke();
-    ctx.globalAlpha = 1.0;
-  } else {
-    // Portal effect when open
-    ctx.fillStyle = 'rgba(157, 78, 221, 0.2)';
-    ctx.fillRect(door.x, door.y, door.width, door.height);
-    
-    // Particles inside portal
-    ctx.fillStyle = '#fff';
-    for (let i = 0; i < 5; i++) {
-      const px = door.x + (Math.sin(Date.now() / 200 + i) * 0.5 + 0.5) * door.width;
-      const py = door.y + (Math.cos(Date.now() / 300 + i) * 0.5 + 0.5) * door.height;
-      ctx.beginPath();
-      ctx.arc(px, py, 1.5, 0, Math.PI * 2);
-      ctx.fill();
-    }
+    ctx.restore();
   }
 
-  if (label) {
-    ctx.fillStyle = 'white';
-    ctx.font = 'bold 13px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.shadowBlur = 4;
-    ctx.shadowColor = 'black';
-    ctx.fillText(label, door.x + door.width / 2, door.y - 15);
-  }
   ctx.restore();
 };

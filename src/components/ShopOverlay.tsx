@@ -7,28 +7,15 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { TRANSLATIONS } from '../localization';
 
-interface ShopItem {
-  id: string;
-  type: 'hat' | 'cape';
-  value: string;
-  name: string;
-  price: number;
-}
-
-const SHOP_ITEMS: ShopItem[] = [
-  { id: 'h1', type: 'hat', value: 'wizard', name: TRANSLATIONS.accessoryWizardHat, price: 5 },
-  { id: 'h2', type: 'hat', value: 'crown', name: TRANSLATIONS.accessoryCrown, price: 15 },
-  { id: 'h3', type: 'hat', value: 'tophat', name: TRANSLATIONS.accessoryTopHat, price: 10 },
-  { id: 'c1', type: 'cape', value: 'red', name: TRANSLATIONS.accessoryRedCape, price: 8 },
-  { id: 'c2', type: 'cape', value: 'blue', name: TRANSLATIONS.accessoryBlueCape, price: 8 },
-  { id: 'c3', type: 'cape', value: 'gold', name: TRANSLATIONS.accessoryGoldCape, price: 20 },
-];
+import { SHOP_ITEMS, ShopItem } from '../constants/shopItems';
 
 interface ShopOverlayProps {
   gems: number;
   ownedItems: string[];
   equippedHat?: string;
   equippedCape?: string;
+  equippedGlasses?: string;
+  equippedStaff?: string;
   onBuy: (item: ShopItem) => void;
   onEquip: (item: ShopItem) => void;
   onClose: () => void;
@@ -39,6 +26,8 @@ export const ShopOverlay: React.FC<ShopOverlayProps> = ({
   ownedItems,
   equippedHat,
   equippedCape,
+  equippedGlasses,
+  equippedStaff,
   onBuy,
   onEquip,
   onClose,
@@ -68,8 +57,11 @@ export const ShopOverlay: React.FC<ShopOverlayProps> = ({
         <div className="flex-1 overflow-y-auto p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
           {SHOP_ITEMS.map((item) => {
             const isOwned = ownedItems.includes(item.id);
-            const isEquipped = (item.type === 'hat' && equippedHat === item.value) || 
-                               (item.type === 'cape' && equippedCape === item.value);
+            const isEquipped = 
+              (item.type === 'hat' && equippedHat === item.value) || 
+              (item.type === 'cape' && equippedCape === item.value) ||
+              (item.type === 'glasses' && equippedGlasses === item.value) ||
+              (item.type === 'staff' && equippedStaff === item.value);
 
             return (
               <div 
@@ -82,7 +74,7 @@ export const ShopOverlay: React.FC<ShopOverlayProps> = ({
               >
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-indigo-900/50 rounded-xl flex items-center justify-center text-2xl">
-                    {item.type === 'hat' ? '🎩' : '🧥'}
+                    {item.icon}
                   </div>
                   <div>
                     <div className="text-white font-bold">{item.name}</div>

@@ -41,4 +41,6 @@ export const TRANSLATIONS = {
   accessoryRedCape: "빨간 망토",
   accessoryBlueCape: "파란 망토",
   accessoryGoldCape: "황금 망토",
+  accessoryHeartGlasses: "하트 안경",
+  accessoryMagicStaff: "마법 지팡이",
 };

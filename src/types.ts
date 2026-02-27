@@ -16,6 +16,8 @@ export interface Rabbit {
   accessories: {
     hat?: 'wizard' | 'crown' | 'tophat';
     cape?: 'red' | 'blue' | 'gold';
+    glasses?: 'heart';
+    staff?: 'magic';
   };
 }
 
