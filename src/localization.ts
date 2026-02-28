@@ -4,7 +4,7 @@
  */
 
 export const TRANSLATIONS = {
-  title: "마법 성의 토끼",
+  title: "마법의 성 토끼",
   subtitle: "마법 계단을 올라 성 꼭대기에 도달하세요!",
   floor: "층",
   magicLevel: "마법 레벨",
