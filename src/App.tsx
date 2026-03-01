@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 import { GameState } from './types';
 import { GRAVITY, JUMP_FORCE, SPEED, CANVAS_WIDTH, CANVAS_HEIGHT, MAX_FLOOR, INITIAL_PLATFORMS } from './constants';
 import { generateQuiz, createFloorPlatforms } from './utils/gameUtils';
-import { getCarrotRewardForFloor, calculateQuizGemReward } from './utils/rewardUtils';
+import { getCarrotRewardForFloor, calculateQuizGemReward, calculateMagicLevel } from './utils/rewardUtils';
 import { drawRabbit } from './utils/rabbitDrawingUtils';
 import { drawDoor } from './utils/propDrawingUtils';
 import { drawBackground } from './utils/backgroundDrawingUtils';
@@ -99,6 +99,13 @@ export default function App() {
   useEffect(() => {
     gameState.current.magicLevel = magicLevel;
   }, [magicLevel]);
+
+  // recalc magic level whenever gems or floor change; keeps state derived
+  // from a single source of truth. this also ensures floor-based progression
+  // (e.g. at 21층 플레이어가 최소 레벨 5가 된다는 요구)를 handled.
+  useEffect(() => {
+    setMagicLevel(calculateMagicLevel(gems, floor));
+  }, [gems, floor]);
 
   useEffect(() => {
     gameState.current.gems = gems;
@@ -199,11 +206,7 @@ export default function App() {
       
       const newGems = gems + earned;
       setGems(newGems);
-      
-      const newLevel = Math.floor(newGems / 10) + 1;
-      if (newLevel > magicLevel) {
-        setMagicLevel(newLevel);
-      }
+      // magicLevel will be recalculated automatically in the effect below
 
       gameState.current.door.isOpen = true;
       setTimeout(() => {

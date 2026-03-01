@@ -38,3 +38,21 @@ export function calculateQuizGemReward(magicLevel: number): number {
   }
   return earned;
 }
+
+/**
+ * Determine the player's magic level based on their accumulated gems and
+ * optionally the current floor.  Previously the level was only updated once
+ * during quiz submission, and it relied on ad-hoc arithmetic scattered in
+ * `App.tsx`.  By centralising the formula we prevent inconsistencies and make
+ * it easy to adjust the progression rule (e.g. tie it to floors later).
+ *
+ * The default behaviour mirrors the original formula (1 level per 10 gems,
+ * starting at level 1).  In addition, a floor-based floor bonus is computed so
+ * that every five floors the base level increments by one; this makes it
+ * impossible to climb dozens of floors and remain stuck at low magic.
+ */
+export function calculateMagicLevel(gems: number, floor: number): number {
+  const gemLevel = Math.floor(gems / 10) + 1;
+  const floorLevel = Math.floor((floor - 1) / 5) + 1; // 1..6 for floors 1..30
+  return Math.max(gemLevel, floorLevel);
+}
