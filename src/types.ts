@@ -44,6 +44,7 @@ export interface Quiz {
 export interface GameState {
   paused: boolean;
   gems: number;
+  carrots?: number;
   magicLevel: number;
   rabbit: Rabbit;
   keys: {

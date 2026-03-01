@@ -11,6 +11,7 @@ import { SHOP_ITEMS, ShopItem } from '../constants/shopItems';
 
 interface ShopOverlayProps {
   gems: number;
+  carrots: number;
   ownedItems: string[];
   equippedHat?: string;
   equippedCape?: string;
@@ -23,6 +24,7 @@ interface ShopOverlayProps {
 
 export const ShopOverlay: React.FC<ShopOverlayProps> = ({
   gems,
+  carrots,
   ownedItems,
   equippedHat,
   equippedCape,
@@ -47,9 +49,15 @@ export const ShopOverlay: React.FC<ShopOverlayProps> = ({
             </h2>
             <p className="text-indigo-300 text-sm">{TRANSLATIONS.shopWelcome}</p>
           </div>
-          <div className="bg-emerald-900/50 border border-emerald-500/30 px-4 py-2 rounded-xl flex items-center gap-2">
-            <span className="text-xl">💎</span>
-            <span className="text-emerald-100 font-mono font-bold text-xl">{gems}</span>
+          <div className="flex gap-2">
+            <div className="bg-emerald-900/50 border border-emerald-500/30 px-4 py-2 rounded-xl flex items-center gap-2">
+              <span className="text-xl">💎</span>
+              <span className="text-emerald-100 font-mono font-bold text-xl">{gems}</span>
+            </div>
+            <div className="bg-yellow-900/50 border border-yellow-500/30 px-4 py-2 rounded-xl flex items-center gap-2">
+              <span className="text-xl">🥕</span>
+              <span className="text-yellow-100 font-mono font-bold text-xl">{carrots}</span>
+            </div>
           </div>
         </div>
 

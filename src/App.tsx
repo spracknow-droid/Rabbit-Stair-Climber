@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import { GameState } from './types';
 import { GRAVITY, JUMP_FORCE, SPEED, CANVAS_WIDTH, CANVAS_HEIGHT, MAX_FLOOR, INITIAL_PLATFORMS } from './constants';
 import { generateQuiz, createFloorPlatforms } from './utils/gameUtils';
+import { getCarrotRewardForFloor, calculateQuizGemReward } from './utils/rewardUtils';
 import { drawRabbit } from './utils/rabbitDrawingUtils';
 import { drawDoor } from './utils/propDrawingUtils';
 import { drawBackground } from './utils/backgroundDrawingUtils';
@@ -31,6 +32,8 @@ export default function App() {
   const [isCorrect, setIsCorrect] = useState(false);
   const [rewardGems, setRewardGems] = useState(0);
   const [gems, setGems] = useState(0);
+  const [rewardCarrots, setRewardCarrots] = useState(0);
+  const [carrots, setCarrots] = useState(0);
   const [magicLevel, setMagicLevel] = useState(1);
   const [ownedItems, setOwnedItems] = useState<string[]>([]);
   const [equippedHat, setEquippedHat] = useState<string | undefined>(undefined);
@@ -42,6 +45,7 @@ export default function App() {
   const gameState = useRef<GameState>({
     paused: false,
     gems: 0,
+    carrots: 0,
     magicLevel: 1,
     rabbit: {
       x: 100,
@@ -88,10 +92,27 @@ export default function App() {
     };
   }, [equippedHat, equippedCape, equippedGlasses, equippedStaff]);
 
+  // when a carrot bonus is awarded we reset it after a short delay so the
+  // little popup disappears automatically.
+  useEffect(() => {
+    if (rewardCarrots > 0) {
+      const t = setTimeout(() => setRewardCarrots(0), 2000);
+      return () => clearTimeout(t);
+    }
+  }, [rewardCarrots]);
+
   const handleNextFloor = () => {
     if (floor >= MAX_FLOOR) {
       setGameStatus('won');
       return;
+    }
+
+    // compute the floor we're about to enter and apply any milestone rewards
+    const nextFloor = floor + 1;
+    const carrotBonus = getCarrotRewardForFloor(nextFloor);
+    if (carrotBonus > 0) {
+      setRewardCarrots(carrotBonus);
+      setCarrots(prev => prev + carrotBonus);
     }
 
     const { rabbit, door, startDoor, platforms } = gameState.current;
@@ -115,7 +136,7 @@ export default function App() {
     door.isOpen = false;
 
     // Shop door appears from floor 10
-    if (floor + 1 >= 10) {
+    if (nextFloor >= 10) {
       gameState.current.shopDoor = {
         x: 700,
         y: 420,
@@ -127,7 +148,7 @@ export default function App() {
       delete gameState.current.shopDoor;
     }
 
-    setFloor(prev => prev + 1);
+    setFloor(nextFloor);
     setIsCorrect(false);
     setShowQuiz(false);
     gameState.current.paused = false;
@@ -258,7 +279,7 @@ export default function App() {
         animate={{ opacity: 1, y: 0 }}
         className="bg-slate-900 p-8 rounded-3xl shadow-2xl border border-indigo-500/30 max-w-4xl w-full"
       >
-        <GameUI floor={floor} gems={gems} magicLevel={magicLevel} />
+        <GameUI floor={floor} gems={gems} carrots={carrots} magicLevel={magicLevel} />
 
         <div className="relative rounded-2xl overflow-hidden border-4 border-indigo-800 shadow-[0_0_30px_rgba(0,0,0,0.5)] bg-slate-950">
           <canvas 
@@ -269,19 +290,25 @@ export default function App() {
           />
 
           {showQuiz && (
-            <QuizOverlay 
-              quiz={quiz} 
-              userAnswer={userAnswer} 
-              setUserAnswer={setUserAnswer} 
-              onSubmit={handleQuizSubmit} 
+            <QuizOverlay
+              quiz={quiz}
+              userAnswer={userAnswer}
+              setUserAnswer={setUserAnswer}
+              onSubmit={handleQuizSubmit}
               isCorrect={isCorrect}
               rewardGems={rewardGems}
             />
+      {rewardCarrots > 0 && (
+        <div className="absolute top-20 left-1/2 transform -translate-x-1/2 text-white text-2xl font-bold z-50">
+          🥕 +{rewardCarrots} {TRANSLATIONS.carrots}
+        </div>
+      )}
           )}
 
           {showShop && (
             <ShopOverlay 
               gems={gems}
+              carrots={carrots}
               ownedItems={ownedItems}
               equippedHat={equippedHat}
               equippedCape={equippedCape}

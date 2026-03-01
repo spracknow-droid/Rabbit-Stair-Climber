@@ -12,10 +12,11 @@ import { MAGIC_ABILITIES } from '../utils/magicUtils';
 interface GameUIProps {
   floor: number;
   gems: number;
+  carrots: number;
   magicLevel: number;
 }
 
-export const GameUI: React.FC<GameUIProps> = ({ floor, gems, magicLevel }) => {
+export const GameUI: React.FC<GameUIProps> = ({ floor, gems, carrots, magicLevel }) => {
   const currentAbility = [...MAGIC_ABILITIES].reverse().find(a => magicLevel >= a.level);
 
   return (
@@ -52,6 +53,20 @@ export const GameUI: React.FC<GameUIProps> = ({ floor, gems, magicLevel }) => {
           >
             <span className="text-xl">💎</span>
             <span className="text-emerald-100 font-mono font-bold">{gems}</span>
+          </motion.div>
+        </div>
+
+        {/* Carrots (floor milestone rewards) */}
+        <div className="flex flex-col items-end">
+          <span className="text-[10px] uppercase tracking-widest text-yellow-400 font-bold">{TRANSLATIONS.carrots}</span>
+          <motion.div 
+            key={carrots}
+            initial={{ scale: 1.2, color: '#fbbf24' }}
+            animate={{ scale: 1, color: '#ecfdf5' }}
+            className="bg-yellow-900/50 border border-yellow-500/30 px-4 py-1 rounded-lg flex items-center gap-2"
+          >
+            <span className="text-xl">🥕</span>
+            <span className="text-yellow-100 font-mono font-bold">{carrots}</span>
           </motion.div>
         </div>
 

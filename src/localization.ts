@@ -35,6 +35,8 @@ export const TRANSLATIONS = {
   equipped: "장착됨",
   notEnoughGems: "보석이 부족합니다!",
   close: "닫기",
+  carrots: "당근",
+  carrotReward: "층 보너스 당근",
   accessoryWizardHat: "마법사 모자",
   accessoryCrown: "황금 왕관",
   accessoryTopHat: "신사 모자",
