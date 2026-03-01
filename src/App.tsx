@@ -92,6 +92,22 @@ export default function App() {
     };
   }, [equippedHat, equippedCape, equippedGlasses, equippedStaff]);
 
+  // ensure gameState ref is aware of the current numeric stats that affect
+  // physics or other logic. previously magicLevel never propagated into the
+  // ref, so abilities like double‑jump/flight never activated despite the UI
+  // showing the level increasing.
+  useEffect(() => {
+    gameState.current.magicLevel = magicLevel;
+  }, [magicLevel]);
+
+  useEffect(() => {
+    gameState.current.gems = gems;
+  }, [gems]);
+
+  useEffect(() => {
+    gameState.current.carrots = carrots;
+  }, [carrots]);
+
   // when a carrot bonus is awarded we reset it after a short delay so the
   // little popup disappears automatically.
   useEffect(() => {
