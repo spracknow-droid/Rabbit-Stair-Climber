@@ -298,11 +298,12 @@ export default function App() {
               isCorrect={isCorrect}
               rewardGems={rewardGems}
             />
-      {rewardCarrots > 0 && (
-        <div className="absolute top-20 left-1/2 transform -translate-x-1/2 text-white text-2xl font-bold z-50">
-          🥕 +{rewardCarrots} {TRANSLATIONS.carrots}
-        </div>
-      )}
+          )}
+
+          {rewardCarrots > 0 && (
+            <div className="absolute top-20 left-1/2 transform -translate-x-1/2 text-white text-2xl font-bold z-50">
+              🥕 +{rewardCarrots} {TRANSLATIONS.carrots}
+            </div>
           )}
 
           {showShop && (
